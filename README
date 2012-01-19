@@ -1,0 +1,40 @@
+Configuration directives:
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+xyz_to_path
+
+Syntax: xyz_to_path  $hashpath  $x  $y  $z
+Default: none
+Context: http, server, location, if
+
+Used variables:
+    $hashpath - returned variable with hashed directory structure.
+    $x, $y, $z - coordinates taken for example from $arg_ variables.
+
+
+Sample confguration:
+~~~~~~~~~~~~~~~~~~~
+
+location = /tiles {
+	root  /some/path/to/tiles/;
+	xyz_to_path  $hashpath  $arg_x  $arg_y  $arg_z;
+	try_files  /$hashpath.png  =404;
+}
+
+Check uri: /tiles?x=111&y=222&z=333, the file /some/path/to/tiles/333/0/0/0/109/254.png will be served.
+
+A bit complex configuration:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+location = /tiles {
+	xyz_to_path  $hashpath  $arg_x  $arg_y  $arg_z;
+	rewrite  ^  /tiles/$hashpath.png;
+}
+
+location  /tiles/ {
+	root  /some/path/to/;
+}
+
+Check uri: /tiles?x=111&y=222&z=333, the file /some/path/to/tiles/333/0/0/0/109/254.png will be served.
+
+
