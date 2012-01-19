@@ -52,20 +52,19 @@ static ngx_int_t
 ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_variable_value_t *v)
 {
     size_t                      len;
-    ngx_int_t                   x, y, z, i, hash[5];
+    ngx_int_t                   x, y, i, hash[5];
     ngx_http_variable_value_t  *v2;
     u_char                     *p;
 
     x = ngx_atoi(v->data, v->len);
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value x: \"%ud\"", x);
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value x: \"%ud\"", x);
 
     v2 = v + 1;
     y = ngx_atoi(v2->data, v2->len);
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value y: \"%ud\"", y);
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value y: \"%ud\"", y);
 
-    v2 = v + 2;
-    z = ngx_atoi(v2->data, v2->len);
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value z: \"%ud\"", z);
+    v2 ++; // z
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value z: \"%s\"", v2->data);
 
     // We attempt to cluster the tiles so that a 16x16 square of tiles will be in a single directory
     // Hash stores our 40 bit result of mixing the 20 bits of the x & y co-ordinates
@@ -77,7 +76,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
         y >>= 4;
     }
 
-    len = v2->len + ngx_strlen("/256/256/256/256/256/");
+    len = v2->len + ngx_strlen("256/256/256/256/256/");
 
     /*
      * NDK provided abbreviation for the following code:
@@ -92,7 +91,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
 
     ngx_memzero (p, len);
 
-    (void) ngx_snprintf(p, len, "/%ud/%ud/%ud/%ud/%ud/%ud", z, hash[4], hash[3], hash[2], hash[1], hash[0]);
+    (void) ngx_snprintf(p, len, "%s/%ud/%ud/%ud/%ud/%ud", v2->data, hash[4], hash[3], hash[2], hash[1], hash[0]);
 
     val->data = p;
     val->len = ngx_strlen(p);
