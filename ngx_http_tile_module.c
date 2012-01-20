@@ -76,7 +76,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
         y >>= 4;
     }
 
-    len = v2->len + ngx_strlen("256/256/256/256/256/");
+    len = v2->len + sizeof("/256/256/256/256/256") - 1;
 
     /*
      * NDK provided abbreviation for the following code:
