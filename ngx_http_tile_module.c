@@ -53,18 +53,29 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
 {
     size_t                      len;
     ngx_int_t                   x, y, i, hash[5];
-    ngx_http_variable_value_t  *v2;
     u_char                     *p;
 
     x = ngx_atoi(v->data, v->len);
+    if (x == NGX_ERROR) {
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path bad value x: \"%v\"", v);
+        return NGX_ERROR;
+    }
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value x: \"%ud\"", x);
 
-    v2 = v + 1;
-    y = ngx_atoi(v2->data, v2->len);
+    v ++;
+    y = ngx_atoi(v->data, v->len);
+    if (y == NGX_ERROR) {
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path bad value y: \"%v\"", v);
+        return NGX_ERROR;
+    }
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value y: \"%ud\"", y);
 
-    v2 ++; // z
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value z: \"%s\"", v2->data);
+    v ++;
+    if (ngx_atoi(v->data, v->len) == NGX_ERROR) {
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path bad value z: \"%v\"", v);
+        return NGX_ERROR;
+    }
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value z: \"%v\"", v);
 
     // We attempt to cluster the tiles so that a 16x16 square of tiles will be in a single directory
     // Hash stores our 40 bit result of mixing the 20 bits of the x & y co-ordinates
@@ -76,7 +87,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
         y >>= 4;
     }
 
-    len = v2->len + sizeof("/256/256/256/256/256") - 1;
+    len = v->len + sizeof("/256/256/256/256/256") - 1;
 
     /*
      * NDK provided abbreviation for the following code:
@@ -91,7 +102,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
 
     ngx_memzero (p, len);
 
-    (void) ngx_snprintf(p, len, "%s/%ud/%ud/%ud/%ud/%ud", v2->data, hash[4], hash[3], hash[2], hash[1], hash[0]);
+    (void) ngx_snprintf(p, len, "%v/%ud/%ud/%ud/%ud/%ud", v, hash[4], hash[3], hash[2], hash[1], hash[0]);
 
     val->data = p;
     val->len = ngx_strlen(p);
