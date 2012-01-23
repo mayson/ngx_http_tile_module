@@ -58,6 +58,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
     x = ngx_atoi(v->data, v->len);
     if (x == NGX_ERROR) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path bad value x: \"%v\"", v);
+        r->err_status = NGX_HTTP_BAD_REQUEST;
         return NGX_ERROR;
     }
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value x: \"%ud\"", x);
@@ -66,6 +67,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
     y = ngx_atoi(v->data, v->len);
     if (y == NGX_ERROR) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path bad value y: \"%v\"", v);
+        r->err_status = NGX_HTTP_BAD_REQUEST;
         return NGX_ERROR;
     }
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value y: \"%ud\"", y);
@@ -73,6 +75,7 @@ ngx_http_tile_xyz_to_path (ngx_http_request_t *r, ngx_str_t *val, ngx_http_varia
     v ++;
     if (ngx_atoi(v->data, v->len) == NGX_ERROR) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path bad value z: \"%v\"", v);
+        r->err_status = NGX_HTTP_BAD_REQUEST;
         return NGX_ERROR;
     }
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "xyz_to_path value z: \"%v\"", v);
