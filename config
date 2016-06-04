@@ -28,7 +28,7 @@ if test -n "$ngx_module_link"; then
 
     . auto/module
 else
-    HTTP_MODULES="$HTTP_MODULES ngx_http_tile_module"
+    HTTP_MODULES="$HTTP_MODULES $ngx_addon_name"
     NGX_ADDON_SRCS="$NGX_ADDON_SRCS $HTTP_TILE_SRCS"
     have=NDK_SET_VAR . auto/have
 fi
