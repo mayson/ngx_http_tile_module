@@ -24,7 +24,7 @@ if test -n "$ngx_module_link"; then
     ngx_module_incs=
     ngx_module_deps=
     ngx_module_srcs="$HTTP_TILE_SRCS"
-    ngx_module_libs=
+    ngx_module_libs=NDK_SET_VAR
 
     . auto/module
 else
